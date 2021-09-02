@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 const Home = ({ userObj }) => {
   const [jweet, setJweet] = useState("");
   const [jweets, setJweets] = useState([]);
-  const [attachment, setAttachment] = useState();
+  const [attachment, setAttachment] = useState("");
   const fileInput = useRef();
 
   useEffect(() => {
@@ -24,14 +24,23 @@ const Home = ({ userObj }) => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    const fileRef = storageService.ref().child(`${userObj.uid}/${uuidv4()}`);
-    await fileRef.putString(attachment, "data_url");
-    // await dbService.collection("jweets").add({
-    //   text: jweet,
-    //   createdAt: Date.now(),
-    //   creatorId: userObj.uid,
-    // });
-    // setJweet("");
+    let attachmentUrl = "";
+    if (attachment !== "") {
+      const attachmentRef = storageService
+        .ref()
+        .child(`${userObj.uid}/${uuidv4()}`);
+      const response = await attachmentRef.putString(attachment, "data_url");
+      attachmentUrl = await response.ref.getDownloadURL();
+    }
+    const jweetObj = {
+      text: jweet,
+      createdAt: Date.now(),
+      creatorId: userObj.uid,
+      attachmentUrl,
+    };
+    await dbService.collection("jweets").add(jweetObj);
+    setJweet("");
+    setAttachment("");
   };
 
   const onChange = (event) => {
@@ -57,7 +66,7 @@ const Home = ({ userObj }) => {
   };
 
   const onClearAttachment = () => {
-    fileInput.current.value = null;
+    setAttachment("");
   };
 
   return (

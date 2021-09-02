@@ -1,4 +1,4 @@
-import { dbService } from "myFirebase";
+import { dbService, storageService } from "myFirebase";
 import { useState } from "react";
 
 const Jweet = ({ jweetObj, isOwner }) => {
@@ -18,10 +18,11 @@ const Jweet = ({ jweetObj, isOwner }) => {
     await dbService.doc(`jweets/${jweetObj.id}`).update({ text: newJweet });
     setEditing(false);
   };
-  const onDeleteClick = () => {
+  const onDeleteClick = async () => {
     const ok = window.confirm("Are you sure with deleting this jweet?");
     if (ok) {
-      dbService.doc(`jweets/${jweetObj.id}`).delete();
+      await dbService.doc(`jweets/${jweetObj.id}`).delete();
+      await storageService.refFromURL(jweetObj.attachmentUrl).delete();
     }
   };
   return (
@@ -43,6 +44,9 @@ const Jweet = ({ jweetObj, isOwner }) => {
       ) : (
         <>
           <h4>{jweetObj.text}</h4>
+          {jweetObj.attachmentUrl && (
+            <img src={jweetObj.attachmentUrl} width="100px" height="100px" />
+          )}
           {isOwner && (
             <>
               <button onClick={toggleEditing}>Edit Jweet</button>
