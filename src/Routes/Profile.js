@@ -36,21 +36,32 @@ const Profile = ({ userObj, refreshUser }) => {
 
   useEffect(() => {
     getMyJweets();
-  }, []);
+  });
 
   return (
-    <>
-      <form onSubmit={onSubmit}>
+    <div className="container">
+      <form onSubmit={onSubmit} className="profileForm">
         <input
-          type="text"
-          placeholder="Display name"
           onChange={onChange}
+          type="text"
+          autoFocus
+          placeholder="Display name"
           value={newDisplayName}
+          className="formInput"
         />
-        <input type="submit" value="Update Profile" />
+        <input
+          type="submit"
+          value="Update Profile"
+          className="formBtn"
+          style={{
+            marginTop: 10,
+          }}
+        />
       </form>
-      <button onClick={onLogoutClick}>Logout</button>
-    </>
+      <span className="formBtn cancelBtn logOut" onClick={onLogoutClick}>
+        Log Out
+      </span>
+    </div>
   );
 };
 
