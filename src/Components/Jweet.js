@@ -6,20 +6,7 @@ import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 const Jweet = ({ jweetObj, isOwner }) => {
   const [editing, setEditing] = useState(false);
   const [newJweet, setNewJweet] = useState(jweetObj.text);
-  const toggleEditing = () => {
-    setEditing((prev) => !prev);
-  };
-  const onChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setNewJweet(value);
-  };
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    await dbService.doc(`jweets/${jweetObj.id}`).update({ text: newJweet });
-    setEditing(false);
-  };
+
   const onDeleteClick = async () => {
     const ok = window.confirm("Are you sure?");
     if (ok) {
@@ -27,6 +14,21 @@ const Jweet = ({ jweetObj, isOwner }) => {
       await storageService.refFromURL(jweetObj.attachmentUrl).delete();
     }
   };
+  const toggleEditing = () => setEditing((prev) => !prev);
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    await dbService.doc(`jweets/${jweetObj.id}`).update({
+      text: newJweet,
+    });
+    setEditing(false);
+  };
+  const onChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setNewJweet(value);
+  };
+
   return (
     <div className="jweet">
       {editing ? (
@@ -35,13 +37,13 @@ const Jweet = ({ jweetObj, isOwner }) => {
             <input
               type="text"
               placeholder="Edit your jweet"
-              onChange={onChange}
               value={newJweet}
               required
               autoFocus
+              onChange={onChange}
               className="formInput"
             />
-            <input type="submit" value="Save" className="formBtn" />
+            <input type="submit" value="Update Jweet" className="formBtn" />
           </form>
           <span onClick={toggleEditing} className="formBtn cancelBtn">
             Cancel
@@ -50,11 +52,9 @@ const Jweet = ({ jweetObj, isOwner }) => {
       ) : (
         <>
           <h4>{jweetObj.text}</h4>
-          {jweetObj.attachmentUrl && (
-            <img src={jweetObj.attachmentUrl} alt="" />
-          )}
+          {jweetObj.attachmentUrl && <img src={jweetObj.attachmentUrl} />}
           {isOwner && (
-            <div className="nweet__actions">
+            <div class="jweet__actions">
               <span onClick={onDeleteClick}>
                 <FontAwesomeIcon icon={faTrash} />
               </span>
